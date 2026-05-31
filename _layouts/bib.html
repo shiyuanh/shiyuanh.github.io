@@ -1,0 +1,68 @@
+---
+---
+
+<div class="row">
+  <div id="{{entry.key}}" class="col-sm-12">
+    {% if entry.type == "thesis" %}
+      {{reference}}
+    {% else %}
+      <div class="title">
+        {% if entry.pdf %}
+          {% if entry.pdf contains '://' %}
+            {% assign paper_url = entry.pdf %}
+          {% else %}
+            {% assign paper_url = entry.pdf | prepend: '/assets/pdf/' | relative_url %}
+          {% endif %}
+          <a href="{{ paper_url }}">{{entry.title}}</a>
+        {% else %}
+          {{entry.title}}
+        {% endif %}
+      </div>
+      <div class="author">
+        {% for author in entry.author_array %}
+          {% assign author_is_self = false %}
+          {% assign author_last_clean = author.last | remove: '*' %}
+          {% assign author_first_clean = author.first | remove: '*' %}
+          {% if author_last_clean == site.scholar.last_name %}
+            {% if site.scholar.first_name contains author_first_clean %}
+              {% assign author_is_self = true %}
+            {% endif %}
+          {% endif %}
+
+          {% if forloop.length == 1 %}
+            {% if author_is_self %}
+              <em>{{author.first}} {{author.last}}</em>
+            {% else %}
+              {{author.first}} {{author.last}}
+            {% endif %}
+          {% else %}
+            {% unless forloop.last %}
+              {% if author_is_self %}
+                <em>{{author.first}} {{author.last}}</em>,
+              {% else %}
+                {{author.first}} {{author.last}},
+              {% endif %}
+            {% else %}
+              {% if author_is_self %}
+                and <em>{{author.first}} {{author.last}}</em>
+              {% else %}
+                and {{author.first}} {{author.last}}
+              {% endif %}
+            {% endunless %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="periodical">
+      {% if entry.type == "article" %}
+        <em>{{entry.journal}}</em>
+      {% elsif entry.type == "inproceedings" %}
+        <em>In {{entry.booktitle}}</em>
+      {% endif %}
+      {% if entry.year %}
+        {{entry.year}}
+      {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
